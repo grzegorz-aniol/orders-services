@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.gangel.orders</groupId>
+	<artifactId>orders-services-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Orders Services</name>
+	<description>Playground for testing different implementation of Customer/Product/Orders usecase</description>
+
+	<modules>
+		<module>jperfstat</module>
+		<module>orders-common</module>
+		<module>abstract-service</module>
+    	<module>orders-sql-service</module>
+		<module>orders-http-service</module>
+		<module>orders-grpc-common</module>
+		<module>orders-grpc-service</module>
+		<module>orders-grpc-client</module>
+		<module>orders-http-client</module>
+   </modules>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.6.RELEASE</version>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Dalston.SR3</spring-cloud.version>
+		<hibernate.version>5.2.8.Final</hibernate.version>
+		<org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
+		<org.projectlombok.version>1.16.18</org.projectlombok.version>
+		<slf4j.version>1.7.25</slf4j.version>
+		<logback.version>1.2.3</logback.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resource-one</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+
+						<configuration>
+							<outputDirectory>../bin</outputDirectory>
+							<overwrite>true</overwrite>
+							<resources>
+								<resource>
+									<directory>.</directory>
+									<includes>
+										<include>alpn-boot.jar</include>
+									</includes>
+								</resource>							
+								<resource>
+									<directory>./target</directory>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+									<excludes>
+										<include>*-shaded.jar</include>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+			   </executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>
