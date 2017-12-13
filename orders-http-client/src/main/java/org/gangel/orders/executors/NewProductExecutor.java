@@ -4,26 +4,25 @@ import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.gangel.orders.job.Configuration;
-import org.gangel.orders.rnd.CustomerGenerator;
+import org.gangel.orders.rnd.ProductGenerator;
 
-public class NewCustomerExecutor extends AbstractTaskExecutor {
+public class NewProductExecutor extends AbstractTaskExecutor {
 
-    public NewCustomerExecutor(){
+    public NewProductExecutor(){
     }
     
     @Override
     @SneakyThrows
     public HttpUriRequest requestSupplier() {
-        String value = mapper.writeValueAsString(CustomerGenerator.generateCustomer());
-        return requestPostBuilder("/api2/customers", value);
+        String value = mapper.writeValueAsString(ProductGenerator.generateProduct());
+        return requestPostBuilder("/api2/products", value);
     }
 
     @Override
     public void responseConsumer(CloseableHttpResponse response, String body) {
         if (response != null) {
             long id = Long.parseLong(response.getFirstHeader("id").getValue());
-            Configuration.maxCustomerId = Math.max(id, Configuration.maxCustomerId);
+            Configuration.maxProductId = Math.max(id, Configuration.maxProductId);
         }
-    }
-
+    }    
 }

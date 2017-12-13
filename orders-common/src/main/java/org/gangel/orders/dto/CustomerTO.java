@@ -1,12 +1,15 @@
 package org.gangel.orders.dto;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter @Setter
+@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @JsonRootName("customer")
 public class CustomerTO implements Serializable {
 

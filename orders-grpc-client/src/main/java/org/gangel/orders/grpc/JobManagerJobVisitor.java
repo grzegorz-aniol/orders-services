@@ -118,4 +118,10 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
         });
     }
 
+    @Override
+    public JobManager visitTraffic() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

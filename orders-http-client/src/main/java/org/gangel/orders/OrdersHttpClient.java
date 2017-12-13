@@ -5,9 +5,12 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.gangel.orders.executors.ConfigurationExecutor;
 import org.gangel.orders.job.Configuration;
 import org.gangel.orders.job.JobManager;
 import org.gangel.orders.job.JobType;
+
+import java.io.IOException;
 
 public class OrdersHttpClient {
 
@@ -25,6 +28,14 @@ public class OrdersHttpClient {
         if (Configuration.isSSL) {
             System.out.println("SSL is enabled");
             System.setProperty("javax.net.ssl.trustStore", Configuration.sslCertFile);
+        }
+        
+        ConfigurationExecutor configTask = new ConfigurationExecutor();
+        try {
+            configTask.call();
+        } catch (IOException e) {
+            System.err.println(e);
+            return; 
         }
         
         JobManager job = Configuration.jobType.accept(new JobTypeVisitor());

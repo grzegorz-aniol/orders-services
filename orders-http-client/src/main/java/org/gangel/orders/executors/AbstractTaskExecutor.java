@@ -32,21 +32,21 @@ public abstract class AbstractTaskExecutor implements Callable<Histogram> {
     
     public abstract HttpUriRequest requestSupplier();
     
-    public void responseConsumer(CloseableHttpResponse response) {        
+    public void responseConsumer(CloseableHttpResponse response, String body) {        
     }
     
-    protected String getProtocol() {
+    public static String getProtocol() {
         return Configuration.isSSL ? "https://" : "http://";
     }
     
-    protected HttpUriRequest requestGetBuilder(String path) {
+    public static HttpUriRequest requestGetBuilder(String path) {
         HttpGet getRequest = new HttpGet(getProtocol() + Configuration.host + ":" + Configuration.port + path);
         getRequest.addHeader("Accept", "application/json");
         return getRequest;
     }
 
     @SneakyThrows
-    protected HttpUriRequest requestPostBuilder(String path, String body) {
+    public static HttpUriRequest requestPostBuilder(String path, String body) {
         HttpPost postRequest = new HttpPost(
                     getProtocol() 
                     + Configuration.host 
@@ -72,7 +72,7 @@ public abstract class AbstractTaskExecutor implements Callable<Histogram> {
         long time = System.nanoTime() - t0;
 
         if (!warmingPhase) {
-            responseConsumer(response);
+            responseConsumer(response, output.toString("UTF-8"));
         }
         response.close();
         

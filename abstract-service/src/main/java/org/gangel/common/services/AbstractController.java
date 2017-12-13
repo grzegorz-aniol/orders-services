@@ -25,6 +25,11 @@ public abstract class AbstractController<E extends AbstractEntity<ID>, T, ID ext
         return getService().getById(id);
     }
 
+    @RequestMapping(method=RequestMethod.GET, path="/range")
+    public Pair<ID> getRange() {
+        return getService().getIdsRange();
+    }
+    
     @RequestMapping(method=RequestMethod.PUT, path="/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void update(@PathVariable("id") ID id, @RequestBody T dto) {
@@ -40,6 +45,7 @@ public abstract class AbstractController<E extends AbstractEntity<ID>, T, ID ext
         
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path(getEndpointRoot() + "/{id}").buildAndExpand(id).toUri());
+        headers.add("id", id.toString());
 
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }

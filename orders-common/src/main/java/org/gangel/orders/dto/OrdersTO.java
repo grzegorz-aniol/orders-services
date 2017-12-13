@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,7 +21,8 @@ public class OrdersTO implements Serializable {
     private Long id; 
     
     private Long customerId;
-        
+    
+    @Singular
     private List<OrderItemTO> orderItems;
     
 }

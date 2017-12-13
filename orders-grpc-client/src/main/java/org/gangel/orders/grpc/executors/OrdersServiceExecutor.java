@@ -40,14 +40,14 @@ public class OrdersServiceExecutor extends AbstractGrpcServiceExecutor<OrdersSer
             ThreadLocalRandom rnd = ThreadLocalRandom.current();
             
             Orders.Builder ob = Orders.newBuilder()
-                    .setCustomerId(rnd.nextInt(Configuration.minCustomerId, Configuration.maxCustomerId));
+                    .setCustomerId(rnd.nextLong(Configuration.minCustomerId, Configuration.maxCustomerId));
             
             for (int i=0; i < 4; ++i) {
                 ob.addOrderItem(OrderItem.newBuilder()
                         .setLineNumber(i+1)
                         .setQuantity(rnd.nextInt(1,17))
                         .setAmount(rnd.nextInt(1,1500))
-                        .setProductId(rnd.nextInt(Configuration.minProductId,Configuration.maxProductId))
+                        .setProductId(rnd.nextLong(Configuration.minProductId,Configuration.maxProductId))
                         .build()
                 );
             }
@@ -62,7 +62,7 @@ public class OrdersServiceExecutor extends AbstractGrpcServiceExecutor<OrdersSer
         return new OrdersServiceExecutor((stub) -> {
             return stub.getOrder(GetOrderRequest.newBuilder()
                     .setId(ThreadLocalRandom.current()
-                            .nextInt(Configuration.minOrdersId, Configuration.maxOrdersId))
+                            .nextLong(Configuration.minOrdersId, Configuration.maxOrdersId))
                     .build());
         });
     }

@@ -1,7 +1,10 @@
 package org.gangel.orders;
 
 import org.gangel.orders.executors.NewCustomerExecutor;
+import org.gangel.orders.executors.NewOrdersExecutor;
+import org.gangel.orders.executors.NewProductExecutor;
 import org.gangel.orders.executors.PingExecutor;
+import org.gangel.orders.executors.TrafficExecutor;
 import org.gangel.orders.job.JobManager;
 import org.gangel.orders.job.JobType;
 
@@ -29,8 +32,9 @@ public class JobTypeVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitNewProduct() {
-        // TODO Auto-generated method stub
-        return null;
+        return new JobManager(JobType.NEWPRODUCT, () -> {
+            return new NewProductExecutor();
+        });
     }
 
     @Override
@@ -41,8 +45,9 @@ public class JobTypeVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitNewOrders() {
-        // TODO Auto-generated method stub
-        return null;
+        return new JobManager(JobType.NEWORDERS, () -> {
+            return new NewOrdersExecutor();
+        });
     }
 
     @Override
@@ -67,6 +72,13 @@ public class JobTypeVisitor implements JobType.Visitor<JobManager> {
     public JobManager visitStreamOfPings() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public JobManager visitTraffic() {
+        return new JobManager(JobType.TRAFFIC, () -> {
+            return new TrafficExecutor();
+        });
     }
 
 }

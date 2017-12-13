@@ -43,7 +43,7 @@ public class ProductServiceExecutor extends AbstractGrpcServiceExecutor<ProductS
         return new ProductServiceExecutor((stub) -> {
             return stub.getProduct(GetProductRequest.newBuilder()
                     .setId(ThreadLocalRandom.current()
-                            .nextInt(Configuration.minProductId, Configuration.maxProductId))
+                            .nextLong(Configuration.minProductId, Configuration.maxProductId))
                     .build());
         });
     }

@@ -76,6 +76,16 @@ public enum JobType  {
             return visitor.visitStreamOfNewCustomers();
         }
         
+    },
+    
+    
+    TRAFFIC("Simulation of user's traffic") {
+
+        @Override
+        public <T> T accept(Visitor<T> visitor) {
+            return visitor.visitTraffic();
+        }
+        
     }
     ;
     
@@ -90,6 +100,7 @@ public enum JobType  {
     
     public interface Visitor<T> {
         T visitPing();
+        T visitTraffic();
         T visitNewCustomer();
         T visitGetCustomer();
         T visitNewProduct();

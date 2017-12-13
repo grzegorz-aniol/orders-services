@@ -49,7 +49,7 @@ public class CustomerServiceExecutor extends AbstractGrpcServiceExecutor<Custome
         return new CustomerServiceExecutor((stub) -> {
             return stub.getCustomer(GetCustomerRequest.newBuilder()
                     .setId(ThreadLocalRandom.current()
-                            .nextInt(Configuration.minCustomerId, Configuration.maxCustomerId))
+                            .nextLong(Configuration.minCustomerId, Configuration.maxCustomerId))
                     .build());
         });
     }

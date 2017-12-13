@@ -51,6 +51,8 @@ public class CustomerMapperTest {
                 .build();
         
         
+        
+        
         org.gangel.orders.entity.Customer customerEntity = customerMapper.toEntity(customerProto);
         
         assertEquals(new Long(OBJECT_ID), customerEntity.getId());

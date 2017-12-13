@@ -1,10 +1,10 @@
 package org.gangel.orders.grpc.service.data;
 
+import org.gangel.orders.dto.PairIds;
 import org.gangel.orders.grpc.mappers.AbstractGrpcMapper;
 import org.gangel.orders.grpc.mappers.CustomerMapper;
 import org.gangel.orders.proto.Customer;
 import org.gangel.orders.repository.CustomerRepository;
-import org.gangel.orders.repository.IdsRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class CustomerDataService
     }
     
     @Transactional(readOnly=true) 
-    public IdsRange getIdsRange() {
+    public PairIds getIdsRange() {
         return repository.getIdsRange();
     }  
 

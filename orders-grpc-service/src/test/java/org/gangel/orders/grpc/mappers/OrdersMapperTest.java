@@ -19,6 +19,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.annotation.Import;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -121,6 +124,17 @@ public class OrdersMapperTest {
         
         assertNotNull(orders);
         assertEquals(OBJECT_ID.longValue(), orders.getId());
+        
+        try {
+            orders.writeTo(new FileOutputStream("./order.bin"));
+            System.out.println(ordersEntity.toString());
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         List<OrderItem> orderItemList = orders.getOrderItemList();
         assertNotNull(orderItemList);
