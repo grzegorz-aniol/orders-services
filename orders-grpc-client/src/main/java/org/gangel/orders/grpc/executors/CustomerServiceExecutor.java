@@ -1,10 +1,9 @@
 package org.gangel.orders.grpc.executors;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.ManagedChannel;
 import io.netty.util.internal.ThreadLocalRandom;
-import org.gangel.jperfstat.Histogram;
+import lombok.NoArgsConstructor;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.job.Configuration;
 import org.gangel.orders.proto.Customer;
 import org.gangel.orders.proto.CustomerServiceGrpc;
@@ -16,42 +15,57 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
-public class CustomerServiceExecutor extends AbstractGrpcServiceExecutor<CustomerServiceFutureStub> {
-
-    public CustomerServiceExecutor(Function<CustomerServiceFutureStub, ListenableFuture<? extends GeneratedMessageV3>> requestFunction) {
-        super(requestFunction);
+@NoArgsConstructor
+public class CustomerServiceExecutor extends AbstractGrpcServiceExecutor {
+    
+    private Function<CustomerServiceFutureStub, GrpcCallEndpoint> requestFunction;
+    
+    public CustomerServiceExecutor(Function<CustomerServiceFutureStub, GrpcCallEndpoint> requestFunction) {
+        this.requestFunction = requestFunction;
     }
 
-    @Override
-    protected CustomerServiceFutureStub produceStub(ManagedChannel channel) {
-        return CustomerServiceGrpc.newFutureStub(channel);
+    public static GrpcCallEndpoint getNewCustomerEndpoint(CustomerServiceFutureStub stub) {
+        return new GrpcCallEndpoint("NewCustomerRequest", stub.createNewCustomer(NewCustomerRequest.newBuilder()
+                .setCustomer(Customer.newBuilder()
+                        .setName(UUID.randomUUID().toString().substring(0, 10))
+                        .setLastname(UUID.randomUUID().toString().substring(0,10))
+                        .setEmail("test@domain.com")
+                        .build())
+                .build())
+                );
     }
     
-    public static CustomerServiceExecutor getNewCustomerRequestExecutor() {
-        return new CustomerServiceExecutor((stub) -> {
-            return stub.createNewCustomer(NewCustomerRequest.newBuilder()
-                    .setCustomer(Customer.newBuilder()
-                            .setName(UUID.randomUUID().toString().substring(0, 10))
-                            .setLastname(UUID.randomUUID().toString().substring(0,10))
-                            .setEmail("test@domain.com")
-                            .build())
-                    .build());
-        });
-    }
-    
+
+    public static GrpcCallEndpoint getGetCustomerEndpoint(CustomerServiceFutureStub stub) {
+        return new GrpcCallEndpoint("GetCustomerRequest", stub.getCustomer(GetCustomerRequest.newBuilder()
+                .setId(ThreadLocalRandom.current()
+                        .nextLong(Configuration.minCustomerId, Configuration.maxCustomerId))
+                .build()));
+    }    
     public static CustomerServiceExecutor getStreamOfNewCustomersRequestExecutor() {
         return new CustomerServiceExecutor((stub) -> {
             return null;
         });
     }
 
-    public static Callable<Histogram> getGetCustomerRequestExecutor() {
-        return new CustomerServiceExecutor((stub) -> {
-            return stub.getCustomer(GetCustomerRequest.newBuilder()
-                    .setId(ThreadLocalRandom.current()
-                            .nextLong(Configuration.minCustomerId, Configuration.maxCustomerId))
-                    .build());
-        });
+    public static Callable<TrafficHistogram> getGetCustomerRequestExecutor() {
+        return new CustomerServiceExecutor(CustomerServiceExecutor::getGetCustomerEndpoint);
+    }
+
+    public static CustomerServiceExecutor getNewCustomerRequestExecutor() {
+        return new CustomerServiceExecutor(CustomerServiceExecutor::getNewCustomerEndpoint);
+    }
+   
+    protected CustomerServiceFutureStub stub; 
+
+    @Override
+    protected void onChannel(ManagedChannel channel) {
+        stub = CustomerServiceGrpc.newFutureStub(channel);        
+    }
+
+    @Override
+    protected GrpcCallEndpoint createNewRequest() {
+        return requestFunction.apply(stub);
     }
 
 }

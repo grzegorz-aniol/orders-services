@@ -1,5 +1,7 @@
 package org.gangel.jperfstat;
 
+import java.util.Map;
+
 public class HistogramStatsFormatter {
 
     public static ResultsTable.RowBuilder addStatsRow(final ResultsTable.RowBuilder rowBuilder, Histogram.Statistics stats) {
@@ -14,5 +16,9 @@ public class HistogramStatsFormatter {
             .set("100th", Histogram.Statistics.convertToMils(stats.p100th)) // worst time
             .set("execution time[s]", stats.startTime != null && stats.stopTime != null ? 1e-3*(stats.stopTime.toMillis() - stats.startTime.toMillis()) : Double.NaN);
     };
- 
+
+    public static ResultsTable addStatsRow(final ResultsTable table, Map<String, Histogram.Statistics> stats) {
+        return table; 
+    }
+    
 }

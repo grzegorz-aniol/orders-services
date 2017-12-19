@@ -6,6 +6,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.gangel.orders.grpc.common.GlobalExceptionHandler;
+import org.gangel.orders.grpc.executors.ConfigurationExecutor;
 import org.gangel.orders.job.Configuration;
 import org.gangel.orders.job.JobManager;
 import org.gangel.orders.job.JobType;
@@ -80,11 +81,14 @@ public class OrdersGRpcClientApp {
         
         try {
             setOptions(args);
+            // get configuration from server
+            new ConfigurationExecutor().call();
         } catch (Exception e2) {
             System.err.println(e2.getMessage());
             e2.printStackTrace();
             return; 
         }
+        
         
         JobManager mgr = getJobManagerForJobType(Configuration.jobType);
         

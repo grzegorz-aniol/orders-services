@@ -1,21 +1,36 @@
 package org.gangel.orders.executors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.gangel.orders.job.Configuration;
 import org.gangel.orders.rnd.OrdersGenerator;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class NewOrdersExecutor extends AbstractTaskExecutor {
 
     public NewOrdersExecutor(){
     }
     
+    @SneakyThrows
+    public static HttpCallRequest getGetOrdersEndpoint() {
+        ThreadLocalRandom rnd = ThreadLocalRandom.current();
+        return new HttpCallRequest("GetOrders", requestGetBuilder(ENDPOINT_ORDERS + "/"
+                + rnd.nextLong(Configuration.minOrdersId, Configuration.maxOrdersId)));        
+    }
+    
+    @SneakyThrows
+    public static HttpCallRequest getNewOrdersEndpoint() {
+        ObjectMapper mapper = new ObjectMapper();
+        String value = mapper.writeValueAsString(OrdersGenerator.generateOrders());
+        return new HttpCallRequest("CreateOrders",requestPostBuilder("/api2/orders", value));        
+    }
+    
     @Override
     @SneakyThrows
-    public HttpUriRequest requestSupplier() {
-        String value = mapper.writeValueAsString(OrdersGenerator.generateOrders());
-        return requestPostBuilder("/api2/orders", value);
+    public HttpCallRequest requestSupplier() {
+        return NewOrdersExecutor.getNewOrdersEndpoint();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.gangel.orders.grpc.executors;
 
 import io.grpc.stub.StreamObserver;
-import org.gangel.jperfstat.Histogram;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.proto.CustomerServiceGrpc;
 import org.gangel.orders.proto.CustomerServiceGrpc.CustomerServiceStub;
 import org.gangel.orders.proto.NewCustomerRequest;
@@ -18,7 +18,7 @@ public abstract class CustomerRequestExecutor<
         super(channel -> CustomerServiceGrpc.newStub(channel));
     }
 
-    public static Callable<Histogram> newCustomers() {
+    public static Callable<TrafficHistogram> newCustomers() {
         return new CustomerRequestExecutor<NewCustomerRequest, NewCustomerResponse>() {
             @Override
             protected StreamObserver<NewCustomerRequest> getRpcCall(CustomerServiceStub stub,

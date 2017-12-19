@@ -3,7 +3,7 @@ package org.gangel.jperfstat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -49,6 +49,11 @@ public class ResultsTable {
                 
         public RowBuilder set(String key, double value) {
             set(key, String.format("%." + Integer.toString(precision) + "f", value));
+            return this; 
+        }
+        
+        public RowBuilder set(String key, long value) {
+            set(key, String.format("%d", value));
             return this; 
         }
         
@@ -102,7 +107,7 @@ public class ResultsTable {
     };
     
     private ArrayList<String> headers = new ArrayList<>();
-    private LinkedHashMap<String, Row> rows = new LinkedHashMap<>();
+    private LinkedList<Row> rows = new LinkedList<>();
 
     public ResultsTable() {
     }
@@ -123,7 +128,8 @@ public class ResultsTable {
     }
 
     public RowBuilder withRow(final String rowName) {
-        Row row = rows.compute(rowName, (k,v) -> v == null ? new Row(this, headers, rowName) : v );
+        Row row = new Row(this, headers, rowName);
+        rows.add(row);
         return row.set("Name", rowName);
     }   
 
@@ -141,7 +147,7 @@ public class ResultsTable {
             sb.append(header==null ? "" : header).append(";");
         }
         sb.append("\n");
-        for (Row r : rows.values()) {
+        for (Row r : rows) {
             outputCsvDataRow(sb, r);
         }
         System.out.println(sb.toString());
@@ -149,7 +155,7 @@ public class ResultsTable {
     
     public void outputAsData() {
         StringBuffer sb = new StringBuffer();
-        for (Row r : rows.values()) {
+        for (Row r : rows) {
             Iterator<Entry<String, String>> iterator = r.values.entrySet().iterator();
             while (iterator.hasNext()) {
                 Entry<String, String> entry = iterator.next();

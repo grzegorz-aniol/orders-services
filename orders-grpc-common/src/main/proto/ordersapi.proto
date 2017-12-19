@@ -13,6 +13,21 @@ message SetOfIds {
 	repeated int64 ids = 1;	
 }
 
+message IdRange {
+	int64 minId = 1;
+	int64 maxId = 2;
+}
+
+message ConfigurationResponse {
+	IdRange customerRange = 1;
+	IdRange productRange = 2;
+	IdRange ordersRange = 3; 
+}
+
+service ConfigurationService {
+	rpc GetConfiguration(google.protobuf.Empty) returns (ConfigurationResponse) {}
+}
+
 service CustomerService {
 	// unary calls
 	rpc CreateNewCustomer(NewCustomerRequest) returns (NewCustomerResponse) {}

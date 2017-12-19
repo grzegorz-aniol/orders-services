@@ -1,13 +1,11 @@
 package org.gangel.orders.grpc.executors;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.Message;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
 import lombok.SneakyThrows;
-import org.gangel.jperfstat.Histogram;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.grpc.common.GlobalExceptionHandler;
 import org.gangel.orders.job.Configuration;
 
@@ -16,68 +14,68 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
-public abstract class AbstractGrpcServiceExecutor<S> implements Callable<Histogram> {
+public abstract class AbstractGrpcServiceExecutor implements Callable<TrafficHistogram> {
     
-    private Histogram histogram;
+    private TrafficHistogram histogram;
 
-    private Function<S, ListenableFuture<? extends GeneratedMessageV3>> requestFunction;
-
-    protected AbstractGrpcServiceExecutor(Function<S, ListenableFuture<? extends GeneratedMessageV3> > requestFunction) {
-        this.requestFunction = requestFunction;
+    protected AbstractGrpcServiceExecutor() {
     }
     
-    protected abstract S produceStub(final ManagedChannel channel);
+    protected abstract void onChannel(final ManagedChannel channel);
     
-    public Histogram getHistogram() {
+    protected abstract GrpcCallEndpoint createNewRequest(); 
+    
+    public TrafficHistogram getHistogram() {
         return this.histogram;
     }
 
     @SneakyThrows
-    private long sendRequest(final S stub, boolean isWarmPhase) {
+    private void sendRequest(boolean isWarmPhase) {
         long t0 = System.nanoTime();
         
-        ListenableFuture<? extends Message> future = requestFunction.apply(stub);
+        GrpcCallEndpoint endpoint = createNewRequest();
         Message response;
         try {
-            response = future.get(5, TimeUnit.SECONDS);
+            response = endpoint.getResult().get(5, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }                
         
-        long time = (System.nanoTime() - t0);
+        long endTime = System.nanoTime();
+        
+        if (!isWarmPhase) {
+            histogram.put(endpoint.getPath(), t0, endTime);
+        }
+
         if (response == null) {
             throw new RuntimeException("Wrong response: null object");
         }
         
-        return time;
-            
     }
     
-    public Histogram call() throws Exception {
+    public TrafficHistogram call() throws Exception {
         
         GlobalExceptionHandler.register();
-        histogram = new Histogram(Configuration.numOfIterations);
+        histogram = new TrafficHistogram(Configuration.numOfIterations);
 
         final ManagedChannel channel = NettyChannelBuilder
                 .forAddress(Configuration.host, Configuration.port).sslContext(GrpcSslContexts
                         .forClient().trustManager(new File(Configuration.certFilePath)).build())
                 .build();
-        final S stub = produceStub(channel);
+        onChannel(channel);
         
         if (Configuration.numOfWarmIterations > 0) {
             for (long i = 0; i < Configuration.numOfWarmIterations; ++i) {
-                sendRequest(stub, true);
+                sendRequest(true);
             }
         }
 
         histogram.setStartTime();
         for (long i = 0; i < Configuration.numOfIterations; ++i) {
-            long time = sendRequest(stub, false);
-            histogram.put(time);
+            sendRequest(false);
         }
-        histogram.setStopTime();
+        histogram.setEndTime();
 
         channel.shutdown();
         channel.awaitTermination(5, TimeUnit.SECONDS);

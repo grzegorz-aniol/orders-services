@@ -4,7 +4,10 @@ import io.grpc.ManagedChannel;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import org.gangel.jperfstat.Histogram;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.grpc.common.GlobalExceptionHandler;
 import org.gangel.orders.job.Configuration;
 
@@ -21,9 +24,9 @@ import java.util.function.Function;
 public abstract class AbstractGrpcAsyncExecutor<S extends io.grpc.stub.AbstractStub<?>, 
         R extends com.google.protobuf.GeneratedMessageV3, 
         O extends com.google.protobuf.GeneratedMessageV3> 
-    implements Callable<Histogram> {
+    implements Callable<TrafficHistogram> {
 
-    private final Histogram histogram = new Histogram(Configuration.numOfIterations);
+    private final TrafficHistogram histogram = new TrafficHistogram(Configuration.numOfIterations);
     
     private Function<ManagedChannel, S> stubFuctory; 
     
@@ -36,7 +39,7 @@ public abstract class AbstractGrpcAsyncExecutor<S extends io.grpc.stub.AbstractS
     protected abstract R produceRequest();
     
     @Override
-    public Histogram call() throws Exception {
+    public TrafficHistogram call() throws Exception {
         GlobalExceptionHandler.register();
 
         final ManagedChannel channel = NettyChannelBuilder
@@ -50,7 +53,7 @@ public abstract class AbstractGrpcAsyncExecutor<S extends io.grpc.stub.AbstractS
 
         histogram.setStartTime();
         proceedRequests(channel, Configuration.numOfIterations, false);            
-        histogram.setStopTime();
+        histogram.setEndTime();
 
         channel.shutdown();
         channel.awaitTermination(5, TimeUnit.SECONDS);
@@ -58,10 +61,16 @@ public abstract class AbstractGrpcAsyncExecutor<S extends io.grpc.stub.AbstractS
         return histogram;    
     }
     
+    @Getter @AllArgsConstructor @NoArgsConstructor
+    private static class RequestTrackInfo {
+        private long startTime;
+        private String path; 
+    };
+    
     protected void proceedRequests(ManagedChannel channel, long count, boolean isWarming) {
         
         final AtomicLong activeRequests = new AtomicLong(0);    // current number of active requests - should be aprox. equals to initial value for semaphore 'readyToSend'
-        final Deque<Long> startTime = new ConcurrentLinkedDeque<>(); // measure start time of request sending 
+        final Deque<RequestTrackInfo> startTime = new ConcurrentLinkedDeque<>(); // measure start time of request sending 
         final CountDownLatch waitForFinishAll = new CountDownLatch((int)count); // count down latch for all responses
         final Semaphore readyToSend = new Semaphore(1); // max concurrent requests to send before waiting for response
         
@@ -74,12 +83,13 @@ public abstract class AbstractGrpcAsyncExecutor<S extends io.grpc.stub.AbstractS
             @Override
             public void onNext(O value) {
                 // save time
-                long requestTime = System.nanoTime() - startTime.pollLast();
+                RequestTrackInfo track = startTime.pollLast();
+                long endTime = System.nanoTime();
                 // allow to send next request
                 readyToSend.release();
                 // track performance sample
                 if (!isWarming) {
-                    histogram.put(requestTime);
+                    histogram.put(track.getPath(), track.getStartTime(), endTime);
                 }
                 // decrease number of active requests
                 activeRequests.decrementAndGet();
@@ -108,7 +118,7 @@ public abstract class AbstractGrpcAsyncExecutor<S extends io.grpc.stub.AbstractS
             }
             activeRequests.getAndIncrement();
             R request = produceRequest();
-            startTime.addFirst(System.nanoTime());
+            startTime.addFirst(new RequestTrackInfo(System.nanoTime(), request.getClass().getSimpleName()));
             requestObserver.onNext(request);
         }
         

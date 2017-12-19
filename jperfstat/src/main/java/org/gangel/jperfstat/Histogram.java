@@ -20,7 +20,7 @@ import java.util.Iterator;
  */
 public class Histogram {
 
-    private final static TemporalUnit PRECISION_UNITS = ChronoUnit.NANOS;
+    public final static TemporalUnit PRECISION_UNITS = ChronoUnit.NANOS;
     
     private TemporalUnit units = PRECISION_UNITS;
     
@@ -39,6 +39,7 @@ public class Histogram {
         public Duration sumTime = Duration.ofNanos(0);
         public Duration startTime = null;
         public Duration stopTime = null;
+        public long requestCnt = 0;
         
         public Statistics() {
         }
@@ -70,6 +71,8 @@ public class Histogram {
         
     }
     
+    private long requestCnt = 0;
+    
     private int maxSamples = 10_000;
     
     private Deque<Long> samples;
@@ -93,11 +96,24 @@ public class Histogram {
         startTimestamp = System.nanoTime();
     }
     
+    public void setStartTime(long time) {
+        startTimestamp = time; 
+    }
+    
+    public void setStopTime(long time) {
+        stopTimestamp = time;
+    }
+
     public void setStopTime() {
         stopTimestamp = System.nanoTime();
     }
     
+    public long getRequestCnt() {
+        return this.requestCnt;
+    }
+    
     public void put(long value) {
+        ++requestCnt;
         samples.add(value);
         if (samples.size() > maxSamples) {
            samples.remove();
@@ -143,10 +159,12 @@ public class Histogram {
         long bestTime = Long.MAX_VALUE;
         long startTime = Long.MAX_VALUE;
         long stopTime = 0;
+        long totalRequestCnt = 0;
         
         Iterator<Histogram> iterator = histograms.iterator();
         while (iterator.hasNext()) {
             Histogram h = iterator.next();
+            totalRequestCnt += h.requestCnt;
             totalSize += h.samples.size();
             totalTime += convert(h.totalTime, h.units, PRECISION_UNITS);
             worstTime = Math.max(worstTime, convert(h.worstTime, h.units, PRECISION_UNITS));
@@ -178,6 +196,7 @@ public class Histogram {
         s.sumTime = Duration.of(totalTime, PRECISION_UNITS);
         s.startTime = Duration.of(startTime, PRECISION_UNITS);
         s.stopTime = Duration.of(stopTime, PRECISION_UNITS);
+        s.requestCnt = totalRequestCnt;
         return s; 
     }
 

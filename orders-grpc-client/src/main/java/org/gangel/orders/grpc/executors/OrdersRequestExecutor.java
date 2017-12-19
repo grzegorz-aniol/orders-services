@@ -1,7 +1,7 @@
 package org.gangel.orders.grpc.executors;
 
 import io.grpc.stub.StreamObserver;
-import org.gangel.jperfstat.Histogram;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.proto.OrdersServiceGrpc;
 import org.gangel.orders.proto.OrdersServiceGrpc.OrdersServiceStub;
 import org.gangel.orders.proto.PingRequest;
@@ -18,7 +18,7 @@ public abstract class OrdersRequestExecutor<
         super(channel -> OrdersServiceGrpc.newStub(channel));
     }
     
-    public static Callable<Histogram> newPingsExecutor() {
+    public static Callable<TrafficHistogram> newPingsExecutor() {
         return new OrdersRequestExecutor<PingRequest, PingResponse>() {
 
             @Override

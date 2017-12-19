@@ -1,12 +1,13 @@
 package org.gangel.orders.grpc;
 
 import lombok.NonNull;
-import org.gangel.jperfstat.Histogram;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.grpc.executors.CustomerRequestExecutor;
 import org.gangel.orders.grpc.executors.CustomerServiceExecutor;
 import org.gangel.orders.grpc.executors.OrdersRequestExecutor;
 import org.gangel.orders.grpc.executors.OrdersServiceExecutor;
 import org.gangel.orders.grpc.executors.ProductServiceExecutor;
+import org.gangel.orders.grpc.executors.TrafficServiceExecutor;
 import org.gangel.orders.job.Configuration;
 import org.gangel.orders.job.JobManager;
 import org.gangel.orders.job.JobType;
@@ -25,9 +26,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
     @Override
     @NonNull
     public JobManager visitPing() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return OrdersServiceExecutor.getPingExecutor();
             }
         });
@@ -36,9 +37,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
     @Override
     @NonNull
     public JobManager visitNewCustomer() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return CustomerServiceExecutor.getNewCustomerRequestExecutor();
             }
         });
@@ -46,9 +47,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitGetCustomer() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return CustomerServiceExecutor.getGetCustomerRequestExecutor();
             }
         });
@@ -56,9 +57,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitNewProduct() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return ProductServiceExecutor.getNewProductRequestExecutor();
             }
         });
@@ -66,9 +67,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitGetProduct() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return ProductServiceExecutor.getGetProductRequestExecutor();
             }
         });
@@ -76,9 +77,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitNewOrders() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return OrdersServiceExecutor.getNewOrdersRequestExecutor();
             }
         });
@@ -86,9 +87,9 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitGetOrders() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return OrdersServiceExecutor.getGetOrdersRequestExecutor();
             }
         });
@@ -96,10 +97,10 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitStreamOfNewCustomers() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
 
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return CustomerRequestExecutor.newCustomers();
             }
             
@@ -108,10 +109,10 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitStreamOfPings() {
-        return new JobManager(Configuration.jobType, new Supplier<Callable<Histogram>>() {
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
 
             @Override
-            public Callable<Histogram> get() {
+            public Callable<TrafficHistogram> get() {
                 return OrdersRequestExecutor.newPingsExecutor();
             }
             
@@ -120,8 +121,14 @@ public class JobManagerJobVisitor implements JobType.Visitor<JobManager> {
 
     @Override
     public JobManager visitTraffic() {
-        // TODO Auto-generated method stub
-        return null;
+        return new JobManager(Configuration.jobType, new Supplier<Callable<TrafficHistogram>>() {
+
+            @Override
+            public Callable<TrafficHistogram> get() {
+                return new TrafficServiceExecutor();
+            }
+            
+        });
     }
 
 }

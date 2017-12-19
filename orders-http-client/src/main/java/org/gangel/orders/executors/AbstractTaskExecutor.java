@@ -1,7 +1,9 @@
 package org.gangel.orders.executors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.apache.http.client.ClientProtocolException;
@@ -15,7 +17,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.gangel.jperfstat.Histogram;
+import org.gangel.jperfstat.TrafficHistogram;
 import org.gangel.orders.job.Configuration;
 
 import java.io.ByteArrayOutputStream;
@@ -23,14 +25,24 @@ import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Callable;
 
-public abstract class AbstractTaskExecutor implements Callable<Histogram> {
+public abstract class AbstractTaskExecutor implements Callable<TrafficHistogram> {
 
+    public static final String ENDPOINT_CUSTOMERS = "/api2/customers";
+    public static final String ENDPOINT_PRODUCTS = "/api2/products";
+    public static final String ENDPOINT_ORDERS = "/api2/orders";
+    
+    @Getter @NoArgsConstructor @AllArgsConstructor 
+    protected static class HttpCallRequest {
+        private String name; 
+        private HttpUriRequest request;
+    }
+    
     @Getter
-    private Histogram histogram; 
+    private TrafficHistogram histogram; 
     
     protected ObjectMapper mapper = new ObjectMapper();
     
-    public abstract HttpUriRequest requestSupplier();
+    public abstract HttpCallRequest requestSupplier();
     
     public void responseConsumer(CloseableHttpResponse response, String body) {        
     }
@@ -57,11 +69,11 @@ public abstract class AbstractTaskExecutor implements Callable<Histogram> {
         return postRequest;
     }
 
-    private long sendRequest(CloseableHttpClient httpClient, boolean warmingPhase) throws ClientProtocolException, IOException {
-        HttpUriRequest request = requestSupplier();
+    private void sendRequest(CloseableHttpClient httpClient, boolean warmingPhase) throws ClientProtocolException, IOException {
+        HttpCallRequest call = requestSupplier();
 
         long t0 = System.nanoTime();
-        CloseableHttpResponse response = httpClient.execute(request);
+        CloseableHttpResponse response = httpClient.execute(call.getRequest());
         int code = response.getStatusLine().getStatusCode();
         if (code/100 != 2) {
             throw new RuntimeException("Unexpected response code: " + code);
@@ -69,20 +81,20 @@ public abstract class AbstractTaskExecutor implements Callable<Histogram> {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         response.getEntity().writeTo(output);
         
-        long time = System.nanoTime() - t0;
+        long endTime = System.nanoTime();
 
         if (!warmingPhase) {
+            histogram.put(call.getName(), t0, endTime);            
             responseConsumer(response, output.toString("UTF-8"));
         }
         response.close();
         
-        return time;
     }
     
     @Override
-    public Histogram call() throws Exception {
+    public TrafficHistogram call() throws Exception {
         
-        histogram = new Histogram(Configuration.numOfIterations, ChronoUnit.NANOS);
+        histogram = new TrafficHistogram(Configuration.numOfIterations, ChronoUnit.NANOS);
         
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(Configuration.numOfIterations);
@@ -100,10 +112,9 @@ public abstract class AbstractTaskExecutor implements Callable<Histogram> {
         
         histogram.setStartTime();
         for (long i = 0; i < Configuration.numOfIterations; ++i) {
-            long time = sendRequest(httpClient, false);
-            histogram.put(time);
+            sendRequest(httpClient, false);
         }
-        histogram.setStopTime();
+        histogram.setEndTime();
 
         httpClient.close();
         

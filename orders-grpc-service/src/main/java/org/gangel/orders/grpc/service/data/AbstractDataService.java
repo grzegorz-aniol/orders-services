@@ -2,10 +2,13 @@ package org.gangel.orders.grpc.service.data;
 
 import com.google.protobuf.Message;
 import org.gangel.common.services.AbstractEntity;
+import org.gangel.common.services.Pair;
 import org.gangel.common.services.ServiceListener;
 import org.gangel.orders.grpc.mappers.AbstractGrpcMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,21 @@ public abstract class AbstractDataService<E extends AbstractEntity<ID>,
     @Transactional(readOnly=true)
     public Page<T> getAll(Pageable pageable) {
         return getRepo().findAll(pageable).map(e -> (T)getMapper().toProto(e).build());
+    }
+    
+    @Transactional(readOnly=true)
+    public Pair<ID> getIdsRange() {
+        ID id1 = null;
+        ID id2 = null;
+        Page<E> res1 = getRepo().findAll(new PageRequest(0, 1, Direction.ASC, "id" ));
+        if (res1 != null && res1.getContent()!=null && res1.getContent().size() == 1) {
+            id1 = res1.getContent().get(0).getId();            
+        }
+        Page<E> res2 = getRepo().findAll(new PageRequest(0, 1, Direction.DESC, "id" ));
+        if (res2 != null && res2.getContent()!=null && res2.getContent().size() == 1) {
+            id2 = res2.getContent().get(0).getId();
+        }
+        return new Pair<ID>(id1,id2);
     }
     
 }

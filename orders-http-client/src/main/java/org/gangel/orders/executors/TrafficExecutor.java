@@ -1,60 +1,33 @@
 package org.gangel.orders.executors;
 
 import lombok.SneakyThrows;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.gangel.orders.job.Configuration;
-import org.gangel.orders.rnd.CustomerGenerator;
-import org.gangel.orders.rnd.OrdersGenerator;
-import org.gangel.orders.rnd.ProductGenerator;
+import org.gangel.orders.rnd.Probability;
 
-import java.util.concurrent.ThreadLocalRandom;
-
+/**
+ * Requests executor that simulates user's traffic
+ * 
+ * @author Grzegorz_Aniol
+ *
+ */
 public class TrafficExecutor extends AbstractTaskExecutor {
 
-    private static final String ENDPOINT_CUSTOMERS = "/api2/customers";
-    private static final String ENDPOINT_PRODUCTS = "/api2/products";
-    private static final String ENDPOINT_ORDERS = "/api2/orders";
+    private static final double PROB_READ_DATA = 0.9;
+    private static final double PROB_WRITE_DATA = 1 - PROB_READ_DATA;
 
     @Override
     @SneakyThrows
-    public HttpUriRequest requestSupplier() {
-        ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        
-        if (rnd.nextDouble() < 0.9) {
-            // read operations
-            double hit = rnd.nextDouble();
-            
-            if (hit < 0) {
-                // get customer
-                return requestGetBuilder(ENDPOINT_CUSTOMERS + "/" + rnd.nextLong(Configuration.minCustomerId, Configuration.maxCustomerId));
-            } else if (hit < 0.9) {
-                // get product
-                return requestGetBuilder(ENDPOINT_PRODUCTS + "/" + rnd.nextLong(Configuration.minProductId, Configuration.maxProductId));
-            } else {
-                // get orders
-                return requestGetBuilder(ENDPOINT_ORDERS + "/" + rnd.nextLong(Configuration.minOrdersId, Configuration.maxOrdersId));
-            }
-            
-        } else {
-            // create/update operations
-            double hit = rnd.nextDouble();
-            
-            if (hit < 0.1) {
-                // new customer
-                String value = mapper.writeValueAsString(CustomerGenerator.generateCustomer());
-                return requestPostBuilder(ENDPOINT_CUSTOMERS, value);
-            } else if (hit < 0.9) {
-                // get product
-                String value = mapper.writeValueAsString(ProductGenerator.generateProduct());
-                return requestPostBuilder(ENDPOINT_PRODUCTS, value);
-            } else {
-                // get orders
-                String value = mapper.writeValueAsString(OrdersGenerator.generateOrders());
-                return requestPostBuilder(ENDPOINT_ORDERS, value);
-            }
-            
-        }
-
+    public HttpCallRequest requestSupplier() {
+        return Probability.select(HttpCallRequest.class)
+             // read operations 
+            .with(PROB_READ_DATA * 0.1, NewCustomerExecutor::getGetCustomerEndpoint)
+            .with(PROB_READ_DATA * 0.8, NewProductExecutor::getGetProductEndpoint)
+            .with(PROB_READ_DATA * 0.1, NewOrdersExecutor::getGetOrdersEndpoint)
+            // write operations
+            .with(PROB_WRITE_DATA * 0.1, NewCustomerExecutor::getNewCustomerEndpoint)
+            .with(PROB_WRITE_DATA * 0.1, NewProductExecutor::getNewProductEndpoint)
+            .with(PROB_WRITE_DATA * 0.8, NewOrdersExecutor::getNewOrdersEndpoint)
+            .choose()
+            .get();
     }
 
 }
