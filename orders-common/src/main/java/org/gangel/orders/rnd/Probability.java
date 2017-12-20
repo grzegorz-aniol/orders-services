@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 public class Probability {
     
     public static class Select<T> {
-        private double weigth; 
+        private double weight; 
         private Supplier<T> supplier;
         
         private Select(double w, Supplier<T> sup) {
-            this.weigth = w;
+            this.weight = w;
             this.supplier = sup;
         }
     };
@@ -37,17 +37,17 @@ public class Probability {
             if (list == null || list.size() == 0) {
                 return null;
             }
-            final double sum = list.stream().map(e -> e.weigth).collect(Collectors.summingDouble(e->e));
-            list.stream().forEach( e -> { e.weigth=e.weigth/sum; } );
-            double rnd = ThreadLocalRandom.current().nextDouble(sum); 
+            final double sum = list.stream().map(e -> e.weight).collect(Collectors.summingDouble(e->e));
+            list.stream().forEach( e -> { e.weight=e.weight/sum; } );
+            double rnd = ThreadLocalRandom.current().nextDouble(1.0); 
             
             double localSum = 0;
             Iterator<Select<T>> i = list.iterator();
             
             while (i.hasNext()) {
                 val item = i.next();
-                localSum += item.weigth;
-                if (rnd <= localSum) {
+                localSum += item.weight;
+                if (item.weight > 0.0 && rnd <= localSum) {
                     return item.supplier; 
                 }
             }

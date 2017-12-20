@@ -35,6 +35,7 @@ public class ProductServiceExecutor extends AbstractGrpcServiceExecutor {
     }
     
     public static GrpcCallEndpoint getNewProductEndpoint(ProductServiceFutureStub stub) {
+        Configuration.maxProductId++;
         return new GrpcCallEndpoint(NewProductRequest.class.getSimpleName(), stub.createNewProduct(NewProductRequest.newBuilder()
                 .setProduct(Product.newBuilder()
                         .setTitle(UUID.randomUUID().toString().substring(0, 10))

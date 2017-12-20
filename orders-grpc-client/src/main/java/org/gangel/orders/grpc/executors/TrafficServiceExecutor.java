@@ -36,9 +36,9 @@ public class TrafficServiceExecutor extends AbstractGrpcServiceExecutor {
     @Override
     protected GrpcCallEndpoint createNewRequest() {
         
-        double customersProb = probSize(Configuration.maxCustomerId, Configuration.minCustomerId);
-        double productsProb = probSize(Configuration.maxProductId, Configuration.minProductId);
-        double ordersProb = probSize(Configuration.maxOrdersId, Configuration.minOrdersId);
+        double customersProb = probSize(Configuration.minCustomerId, Configuration.maxCustomerId);
+        double productsProb = probSize(Configuration.minProductId, Configuration.maxProductId);
+        double ordersProb = probSize(Configuration.minOrdersId, Configuration.maxOrdersId);
         
         return Probability.select(GrpcCallEndpoint.class)
             .with(customersProb * 0.1 * READ_PROB, () -> CustomerServiceExecutor.getGetCustomerEndpoint(customerStub))
@@ -46,7 +46,7 @@ public class TrafficServiceExecutor extends AbstractGrpcServiceExecutor {
             .with(ordersProb * 0.1 * READ_PROB, () -> OrdersServiceExecutor.getGetOrdersEndpoint(ordersStub))
             .with(0.1 * WRITE_PROB, () -> CustomerServiceExecutor.getNewCustomerEndpoint(customerStub))
             .with(0.1 * WRITE_PROB, () -> ProductServiceExecutor.getNewProductEndpoint(productStub))
-            .with(0.8 * WRITE_PROB, () -> OrdersServiceExecutor.getNewOrdersEndpoint(ordersStub))
+            .with(customersProb * productsProb * 0.8 * WRITE_PROB, () -> OrdersServiceExecutor.getNewOrdersEndpoint(ordersStub))
             .choose()
             .get();
     }

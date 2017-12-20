@@ -25,6 +25,7 @@ public class CustomerServiceExecutor extends AbstractGrpcServiceExecutor {
     }
 
     public static GrpcCallEndpoint getNewCustomerEndpoint(CustomerServiceFutureStub stub) {
+        Configuration.maxCustomerId++;
         return new GrpcCallEndpoint("NewCustomerRequest", stub.createNewCustomer(NewCustomerRequest.newBuilder()
                 .setCustomer(Customer.newBuilder()
                         .setName(UUID.randomUUID().toString().substring(0, 10))

@@ -58,6 +58,8 @@ public class OrdersServiceExecutor extends AbstractGrpcServiceExecutor {
                     .build());
         }
 
+        Configuration.maxOrdersId++;
+        
         return new GrpcCallEndpoint(NewOrderRequest.class.getSimpleName(),
                 stub.addNewOrder(NewOrderRequest.newBuilder().setOrders(ob.build()).build()));
     }

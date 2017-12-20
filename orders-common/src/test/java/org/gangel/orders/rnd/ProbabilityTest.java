@@ -32,5 +32,18 @@ public class ProbabilityTest {
         
         MatcherAssert.assertThat(result,  CoreMatchers.anyOf(is(1L), is(2L)));
     }
+    
+    @Test
+    public void test100Prob() {
+        Long result = Probability.select(Long.class)
+                .with(0, ()->new Long(0L))
+                .with(1, ()->new Long(1L))
+                .with(0, ()->new Long(2L))
+                .choose()
+                .get();
+        
+        MatcherAssert.assertThat(result,  is(1L));
+        
+    }
 
 }

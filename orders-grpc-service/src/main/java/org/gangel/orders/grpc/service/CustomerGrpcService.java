@@ -41,7 +41,6 @@ public class CustomerGrpcService extends CustomerServiceImplBase  {
             StreamObserver<GetCustomerResponse> responseObserver) {
         
         Customer customer = customerDataService.getById(request.getId());
-        
         responseObserver.onNext(GetCustomerResponse.newBuilder().setCustomer(customer).build());
         responseObserver.onCompleted();
     }
