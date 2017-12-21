@@ -4,6 +4,7 @@ import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
+import lombok.val;
 import org.gangel.orders.grpc.common.GlobalExceptionHandler;
 import org.gangel.orders.job.Configuration;
 import org.gangel.orders.proto.ConfigurationResponse;
@@ -15,6 +16,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class ConfigurationExecutor implements Callable<Void> {
+    
+    private String getIdRangeDesc(IdRange range){
+        val sb = new StringBuilder();
+        sb.append("Min id=").append((range!=null && range.getMinId() > 0 ? range.getMinId() : "N/A"));
+        sb.append(", max id=").append((range!=null && range.getMaxId() > 0 ? range.getMaxId() : "N/A"));
+        return sb.toString();
+    }
 
     @Override
     public Void call() throws Exception {
@@ -38,9 +46,9 @@ public class ConfigurationExecutor implements Callable<Void> {
         Configuration.minOrdersId = ordersRange.getMinId();
         Configuration.maxOrdersId = ordersRange.getMaxId();
         
-        System.out.println("Customers ids range : " + customerRange.toString());
-        System.out.println("Product ids range : " + productRange.toString());
-        System.out.println("Orders ids range : " + ordersRange.toString());
+        System.out.println("Customers ids range : " + getIdRangeDesc(customerRange));
+        System.out.println("Product ids range : " + getIdRangeDesc(productRange));
+        System.out.println("Orders ids range : " + getIdRangeDesc(ordersRange));
         
         channel.shutdown();
         channel.awaitTermination(5, TimeUnit.SECONDS);
