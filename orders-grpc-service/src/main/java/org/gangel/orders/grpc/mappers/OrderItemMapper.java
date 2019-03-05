@@ -33,13 +33,6 @@ public abstract class OrderItemMapper extends AbstractGrpcMapper<org.gangel.orde
     @Override
     public abstract OrderItem.Builder toProto( org.gangel.orders.entity.OrderItem ordersEntity );
     
-    public Collection<org.gangel.orders.entity.OrderItem> map(Collection<OrderItem> source) {
-        if (source == null) {
-            return null;
-        }
-        return source.stream().map((i) -> toEntity(i)).collect(Collectors.toCollection(TreeSet::new));
-    }
-    
     public List<OrderItem> mapEntities(Collection<org.gangel.orders.entity.OrderItem> source) {
         if (source == null) {
             return null;

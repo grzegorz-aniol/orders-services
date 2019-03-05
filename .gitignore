@@ -1,3 +1,9 @@
+# IntelliJ
+.idea
+
+# Gradle
+.gradle
+
 # local H2 databases
 ordersdb.mv.db
 

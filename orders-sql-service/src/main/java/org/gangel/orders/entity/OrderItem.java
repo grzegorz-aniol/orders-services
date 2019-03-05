@@ -2,6 +2,7 @@ package org.gangel.orders.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,7 @@ public class OrderItem extends AbstractEntity<Long> implements Comparable<OrderI
     private Orders order;
     
     @Column(nullable=false, columnDefinition="int default 1")
+	@Builder.Default
     private int quantity = 1;
     
     @Column(nullable=false, columnDefinition="numeric(10,2)")

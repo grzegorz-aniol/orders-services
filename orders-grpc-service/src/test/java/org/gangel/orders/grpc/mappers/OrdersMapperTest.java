@@ -63,11 +63,7 @@ public class OrdersMapperTest {
         
         when(customerMapper.toEntity(any(Customer.class))).thenReturn(new org.gangel.orders.entity.Customer());
         when(customerMapper.toProto(any(org.gangel.orders.entity.Customer.class))).thenReturn(Customer.newBuilder().setId(202L));
-        
-        val ts = new TreeSet<org.gangel.orders.entity.OrderItem>();
-        ts.add(org.gangel.orders.entity.OrderItem.builder().build());
-        when(orderItemMapper.toEntityAsSortedSet(any())).thenReturn(ts);
-    }    
+        }
     
     @Test
     public void testProtoToEntityMapper() {

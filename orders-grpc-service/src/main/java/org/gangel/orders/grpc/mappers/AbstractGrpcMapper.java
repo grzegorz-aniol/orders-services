@@ -99,11 +99,4 @@ public abstract class AbstractGrpcMapper<E extends AbstractEntity<ID>,
         return transferList.stream().map(r->toEntity(r)).collect(Collectors.toList());       
     }    
 
-    public SortedSet<E> toEntityAsSortedSet(List<T> transferList) {
-        if (transferList == null) {
-            return null;
-        }
-        return transferList.stream().map(r->toEntity(r)).collect(Collectors.toCollection(TreeSet::new));       
-    }    
-    
 }

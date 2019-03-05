@@ -1,0 +1,20 @@
+rootProject.name = 'orders-services-parent'
+include ':jperfstat'
+include ':orders-common'
+include ':abstract-service'
+include ':orders-sql-service'
+include ':orders-http-service'
+include ':orders-grpc-common'
+include ':orders-grpc-service'
+include ':orders-grpc-client'
+include ':orders-http-client'
+
+project(':jperfstat').projectDir = "$rootDir/jperfstat" as File
+project(':orders-common').projectDir = "$rootDir/orders-common" as File
+project(':abstract-service').projectDir = "$rootDir/abstract-service" as File
+project(':orders-sql-service').projectDir = "$rootDir/orders-sql-service" as File
+project(':orders-http-service').projectDir = "$rootDir/orders-http-service" as File
+project(':orders-grpc-common').projectDir = "$rootDir/orders-grpc-common" as File
+project(':orders-grpc-service').projectDir = "$rootDir/orders-grpc-service" as File
+project(':orders-grpc-client').projectDir = "$rootDir/orders-grpc-client" as File
+project(':orders-http-client').projectDir = "$rootDir/orders-http-client" as File

@@ -31,6 +31,4 @@ public interface GrpcEntityMapper<E extends AbstractEntity<? extends Serializabl
 
     List<E> toEntity(List<T> transferList);
 
-    SortedSet<E> toEntityAsSortedSet(List<T> transferList);
-    
 }

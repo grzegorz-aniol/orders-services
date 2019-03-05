@@ -1,0 +1,50 @@
+plugins {
+  id "io.freefair.lombok" version "3.1.4" // Automatic lombok and delombok configuration
+}
+description = 'orders-http-service'
+
+//ext.moduleName = 'orders.http.service'
+//compileTestJava {
+//    inputs.property("moduleName", moduleName)
+//    doFirst {
+//        options.compilerArgs = [
+//                '--module-path', classpath.asPath,
+//                '--add-modules', 'junit,java.xml',
+//                '--add-reads', "$moduleName=junit",
+//                '--patch-module', "$moduleName=" + files(sourceSets.test.java.srcDirs).asPath,
+//        ]
+//        classpath = files()
+//    }
+//}
+
+dependencies {
+    compile project(':orders-sql-service')
+    compile(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.6.RELEASE') {
+        exclude(module: 'spring-boot-starter-tomcat')
+    }
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jetty', version:'1.5.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version:'1.5.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version:'1.5.6.RELEASE'
+    compile group: 'org.projectlombok', name: 'lombok', version:'1.16.18'
+    compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version:'1.2.0.Final'
+    compile group: 'org.hibernate', name: 'hibernate-java8', version:'5.2.8.Final'
+    compile group: 'mysql', name: 'mysql-connector-java', version:'8.0.8-dmr'
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version:'1.0.0.Final'
+    compile "org.hibernate:hibernate-entitymanager:5.2.8.Final"
+    compile(group: 'org.hibernate', name: 'hibernate-core', version:'5.2.8.Final') {
+        exclude(module: 'xml-apis')
+        exclude(module: 'cdi-api')
+    }
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version:'1.5.6.RELEASE'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version:'1.2.4.RELEASE'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-sleuth-zipkin', version:'1.2.4.RELEASE'
+    compile group: 'org.postgresql', name: 'postgresql', version:'9.4.1212.jre7'
+    compile group: 'com.h2database', name: 'h2', version:'1.4.196'
+    compile project(':abstract-service')
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.6.RELEASE') {
+        exclude(module: 'commons-logging')
+    }
+    testCompile "javax.xml.bind:jaxb-api:2.3.0"
+    testCompile "com.sun.xml.bind:jaxb-core:2.3.0"
+    testCompile "com.sun.xml.bind:jaxb-impl:2.3.0"
+}
