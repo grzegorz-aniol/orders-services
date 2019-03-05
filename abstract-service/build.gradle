@@ -1,21 +1,21 @@
-plugins {
-  id "io.freefair.lombok" version "3.1.4" // Automatic lombok and delombok configuration
-}
 
 group = 'org.gangel.common.services'
 description = 'abstract-service'
 
+apply plugin: 'net.ltgt.apt'
+
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version:'1.5.6.RELEASE'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.8.9'
-    compile group: 'org.projectlombok', name: 'lombok', version:'1.16.18'
-    compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version:'1.2.0.Final'
-    compile group: 'org.hibernate', name: 'hibernate-java8', version:'5.2.8.Final'
-    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version:'1.0.0.Final'
-    compile (group: 'org.hibernate', name: 'hibernate-core', version:'5.2.8.Final') {
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version:springBootVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.8.9'
+    implementation group: 'org.projectlombok', name: 'lombok', version:"$lombokVersion"
+    implementation group: 'org.mapstruct', name: 'mapstruct-jdk8', version:'1.2.0.Final'
+    implementation group: 'org.hibernate', name: 'hibernate-java8', version:hibernateVersion
+    implementation group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version:'1.0.0.Final'
+    implementation (group: 'org.hibernate', name: 'hibernate-core', version:hibernateVersion) {
 		exclude(module: 'xml-apis')
 		exclude(module: 'cdi-api')
     }
-    compile group: 'org.springframework', name: 'spring-web', version:'4.3.10.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-web', version:'4.3.10.RELEASE'
     testCompile "junit:junit:$junitVersion"
 }
