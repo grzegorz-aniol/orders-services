@@ -29,6 +29,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>${org.projectlombok.version}</version>
 		</dependency>
 
 		<dependency>
@@ -36,11 +37,13 @@
 			<artifactId>mapstruct-jdk8</artifactId>
 			<version>${org.mapstruct.version}</version>
 		</dependency>
-		<dependency>
-            <groupId>org.mapstruct.examples.spi</groupId>
-            <artifactId>protobuf-spi-impl</artifactId>
-            <version>1.0.0</version>		  
-		</dependency>	
+
+		<!--<dependency>-->
+            <!--<groupId>org.mapstruct.examples.spi</groupId>-->
+            <!--<artifactId>protobuf-spi-impl</artifactId>-->
+            <!--<version>1.0.0</version>-->
+		<!--</dependency>-->
+
 		<!-- Disable Tomcat server -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -78,7 +81,7 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.4.0</version>
+			<version>3.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.lognet</groupId>
@@ -149,11 +152,11 @@
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.5.1</version>
+				<version>0.6.1</version>
 				<configuration>
 					<pluginId>grpc-java</pluginId>
-					<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.6.1:exe:${os.detected.classifier}</pluginArtifact>
-					<protocArtifact>com.google.protobuf:protoc:3.4.0:exe:${os.detected.classifier}</protocArtifact>
+					<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.19.0:exe:${os.detected.classifier}</pluginArtifact>
+					<protocArtifact>com.google.protobuf:protoc:3.6.1:exe:${os.detected.classifier}</protocArtifact>
 					<checkStaleness>true</checkStaleness>
 				</configuration>
 				<executions>
@@ -168,7 +171,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>${javaMavenCompilerVersion}</version>
 				<configuration>
 					<source>${java.version}</source> <!-- or higher, depending on your project -->
 					<target>${java.version}</target> <!-- or higher, depending on your project -->
@@ -183,12 +186,12 @@
 							<artifactId>mapstruct-processor</artifactId>
 							<version>${org.mapstruct.version}</version>
 						</path>
-                        <path>
-                            <!-- Add SPI implementation. -->
-                            <groupId>org.mapstruct.examples.spi</groupId>
-                            <artifactId>protobuf-spi-impl</artifactId>
-                            <version>1.0.0</version>
-                        </path>						
+                        <!--<path>-->
+                            <!--&lt;!&ndash; Add SPI implementation. &ndash;&gt;-->
+                            <!--<groupId>org.mapstruct.examples.spi</groupId>-->
+                            <!--<artifactId>protobuf-spi-impl</artifactId>-->
+                            <!--<version>1.0.0</version>-->
+                        <!--</path>						-->
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<arg>-Amapstruct.suppressGeneratorTimestamp=false</arg>

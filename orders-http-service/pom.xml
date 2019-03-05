@@ -82,6 +82,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>${org.projectlombok.version}</version>
 		</dependency>
 
 		<dependency>
@@ -150,7 +151,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>${javaMavenCompilerVersion}</version>
 				<configuration>
 					<source>${java.version}</source> <!-- or higher, depending on your project -->
 					<target>${java.version}</target> <!-- or higher, depending on your project -->

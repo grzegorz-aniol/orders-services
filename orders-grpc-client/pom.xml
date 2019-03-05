@@ -12,9 +12,6 @@
 	<artifactId>orders-grpc-client</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<name>orders-grpc-client</name>
-	<properties>
-		<org.projectlombok.version>1.16.18</org.projectlombok.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -44,7 +41,7 @@
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-stub</artifactId>
-			<version>1.7.0</version>
+			<version>1.19.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
@@ -69,6 +66,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>${org.projectlombok.version}</version>
 		</dependency>
 
 		<!-- logging -->
@@ -117,11 +115,11 @@
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.5.1</version>
+				<version>0.6.1</version>
 				<configuration>
 					<pluginId>grpc-java</pluginId>
 					<pluginArtifact>io.grpc:protoc-gen-grpc-java:1.6.1:exe:${os.detected.classifier}</pluginArtifact>
-					<protocArtifact>com.google.protobuf:protoc:3.4.0:exe:${os.detected.classifier}</protocArtifact>
+					<protocArtifact>com.google.protobuf:protoc:3.6.1:exe:${os.detected.classifier}</protocArtifact>
 					<checkStaleness>true</checkStaleness>
 				</configuration>
 				<executions>
@@ -137,10 +135,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>${javaMavenCompilerVersion}</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 					<encoding>UTF-8</encoding>
 					<annotationProcessorPaths>
 						<path>
