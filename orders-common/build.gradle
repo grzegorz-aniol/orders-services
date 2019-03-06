@@ -1,6 +1,7 @@
 description = 'orders-common'
 
 apply plugin: 'net.ltgt.apt'
+apply plugin: 'org.javamodularity.moduleplugin'
 
 dependencies {
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"

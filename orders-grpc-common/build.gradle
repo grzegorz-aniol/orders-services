@@ -6,6 +6,21 @@ apply plugin: 'com.google.protobuf'
 
 group = 'org.gangel.orders.grpc'
 description = 'orders-grpc-common'
+
+//configurations.all {
+//    exclude module: 'jsr305'
+//}
+
+patchModules.config = [
+    "grpc.core=grpc-context-1.19.0.jar",
+    "javax.annotation.api=jsr305-3.0.2.jar"
+]
+
+compileJava {
+//    options.compilerArgs.addAll(['--add-exports', 'javax.annotation.api/javax.annotation.concurrent=grpc.core'])
+    options.compilerArgs.addAll(['--add-exports', 'javax.annotation.api/javax.annotation.concurrent=grpc.stub'])
+}
+
 dependencies {
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     implementation group: 'org.projectlombok', name: 'lombok', version:lombokVersion
