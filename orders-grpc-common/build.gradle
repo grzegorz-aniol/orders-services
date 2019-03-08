@@ -7,33 +7,28 @@ apply plugin: 'com.google.protobuf'
 group = 'org.gangel.orders.grpc'
 description = 'orders-grpc-common'
 
-//configurations.all {
-//    exclude module: 'jsr305'
-//}
-
 patchModules.config = [
-    "grpc.core=grpc-context-1.19.0.jar",
+    "grpc.core=grpc-context-" + ioGrpcVersion +".jar",
     "javax.annotation.api=jsr305-3.0.2.jar"
 ]
 
 compileJava {
-//    options.compilerArgs.addAll(['--add-exports', 'javax.annotation.api/javax.annotation.concurrent=grpc.core'])
-    options.compilerArgs.addAll(['--add-exports', 'javax.annotation.api/javax.annotation.concurrent=grpc.stub'])
+    options.compilerArgs += ['--add-exports', 'javax.annotation.api/javax.annotation.concurrent=grpc.stub']
 }
 
 dependencies {
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     implementation group: 'org.projectlombok', name: 'lombok', version:lombokVersion
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version:'3.6.1'
-    implementation group: 'io.grpc', name: 'grpc-stub', version:'1.19.0'
-    implementation group: 'io.grpc', name: 'grpc-protobuf', version:'1.19.0'
-	compileOnly "javax.annotation:javax.annotation-api:1.2"	
+    implementation group: 'io.grpc', name: 'grpc-stub', version: ioGrpcVersion
+    implementation group: 'io.grpc', name: 'grpc-protobuf', version: ioGrpcVersion
+	compileOnly "javax.annotation:javax.annotation-api:1.2"
 }
 
 protobuf {
   plugins {
     grpc {
-      artifact = 'io.grpc:protoc-gen-grpc-java:1.19.0'
+      artifact = "io.grpc:protoc-gen-grpc-java:$ioGrpcVersion"
     }
   }
   generateProtoTasks {

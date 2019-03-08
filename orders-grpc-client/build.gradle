@@ -6,17 +6,33 @@ apply plugin: 'com.google.protobuf'
 
 group = 'org.gangel.orders.grpc'
 description = 'orders-grpc-client'
+
+patchModules.config = [
+    "grpc.core=grpc-context-" + ioGrpcVersion + ".jar"
+]
+//
+//test {
+//    moduleOptions {
+//        runOnClasspath = true
+//    }
+//}
+
+patchModules.config = [
+        "grpc.core=grpc-context-" + ioGrpcVersion +".jar",
+        "javax.annotation.api=jsr305-3.0.2.jar"
+]
+
 dependencies {
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     implementation project(':orders-grpc-common')
     implementation project(':jperfstat')
     implementation project(':orders-common')
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.6.1'
-    implementation group: 'io.grpc', name: 'grpc-netty', version: '1.7.0'
-    implementation group: 'io.grpc', name: 'grpc-stub', version: '1.7.0'
-    implementation group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: '2.0.6.Final'
-    implementation group: 'io.netty', name: 'netty-handler', version: '4.1.16.Final'
-    implementation group: 'io.netty', name: 'netty-codec', version: '4.1.16.Final'
+    implementation group: 'io.grpc', name: 'grpc-netty', version: ioGrpcVersion
+    implementation group: 'io.grpc', name: 'grpc-stub', version: ioGrpcVersion
+    implementation group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: '2.0.22.Final'
+    implementation group: 'io.netty', name: 'netty-handler', version: nettyVersion
+    implementation group: 'io.netty', name: 'netty-codec', version: nettyVersion
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
     implementation group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
@@ -26,4 +42,6 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     testCompile "junit:junit:$junitVersion"
+
+    testRuntime "javax.annotation:javax.annotation-api:1.2"
 }

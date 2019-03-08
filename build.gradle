@@ -2,6 +2,7 @@ plugins {
     id "io.freefair.lombok" version "3.1.4" // Automatic lombok and delombok configuration
     id 'net.ltgt.apt' version '0.21' // annotation processor
     id 'org.javamodularity.moduleplugin' version '1.4.0' // java modules management
+    id "com.github.ben-manes.versions" version "0.21.0" // discover dependencies updates
 }
 
 allprojects {
@@ -13,6 +14,7 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'org.javamodularity.moduleplugin'
+    apply plugin: 'com.github.ben-manes.versions'
 
     ext {
         springBootVersion = '1.5.6.RELEASE'
@@ -21,6 +23,8 @@ subprojects {
         junitVersion = '4.12'
         hibernateVersion = '5.2.8.Final'
         mapstructAnotationVersion = '1.3.0.Final'
+        ioGrpcVersion = '1.19.0'
+        nettyVersion = '4.1.33.Final'
     }
 
     sourceCompatibility = 11
@@ -35,6 +39,19 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
+    }
+
+    dependencyUpdates.resolutionStrategy {
+        componentSelection { rules ->
+            rules.all { selection ->
+                boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
+                    selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+                }
+                if (rejected) {
+                    selection.reject('Release candidate')
+                }
+            }
+        }
     }
 
 }

@@ -1,0 +1,11 @@
+module orders.grpc.service {
+  requires lombok;
+  requires org.mapstruct;
+  requires orders.grpc.common;
+  requires spring.boot.starter;
+  requires spring.boot.starter.web;
+  requires spring.boot.starter.data.jpa;
+  requires spring.boot.starter.actuator;
+  requires spring.boot.configuration.processor;
+  requires grpc.spring.boot.starter;
+}
